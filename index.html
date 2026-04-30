@@ -359,10 +359,31 @@
   const entries = [];
   let transport = '電車';
 
-  const WEBHOOK_URL = 'https://hooks.slack.com/services/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';
-  document.getElementById('webhook-url').value = WEBHOOK_URL;
-  document.getElementById('btn-send').disabled = false;
+async function sendToSlack() {
+  // ★ここに、さっきコピーした「ウェブアプリのURL」を貼り付けます
+  const GAS_URL = 'https://script.google.com/a/macros/co-success.jp/s/AKfycbyHpU16y7Dc-SFlMn_ayHREoMbTDGfZILUzUvR-v9TwXaRJn5T-GDjJBzrxS0zLRIIUzA/exec';
+  
+  const msg = buildSlackMsg();
+  if (!msg) return;
 
+  const btn = document.getElementById('btn-send');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  try {
+    // Google(GAS)に向けてデータを送る
+    await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ text: msg })
+    });
+    showToast('Slackに送信しました！', 'ok');
+  } catch (e) {
+    showToast('エラーが発生しました', 'ng');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '送信';
+}
   document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
 
   function selectTP(el) {
