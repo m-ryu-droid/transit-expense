@@ -472,11 +472,11 @@ async function sendToSlack() {
 
   // 1つ1つの項目をバラバラに保ったまま、GASへ送る
   try {
-    await fetch(GAS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify({ items: entries }) // 'text' ではなく 'items' として送る
-    });
+await fetch(GAS_URL, {
+  method: 'POST',
+  mode: 'no-cors',
+  body: JSON.stringify({ items: entries }) // 必ず「items」にする
+});
     
     showToast('スプレッドシートに保存しました！', 'ok');
     
