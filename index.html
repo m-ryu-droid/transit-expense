@@ -5,51 +5,248 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>交通費トラッカー</title>
   <style>
-    /* スタイル部分は変更ないのでそのまま維持（中略） */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #f5f5f3; --surface: #ffffff; --surface2: #f0efea;
-      --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
-      --text: #1a1a18; --text2: #6b6b66; --text3: #9e9e98;
-      --green: #1D9E75; --green-light: #E1F5EE; --green-mid: #5DCAA5;
-      --green-dark: #085041; --green-text: #0F6E56;
-      --radius: 12px; --radius-sm: 8px;
+      --bg: #f5f5f3;
+      --surface: #ffffff;
+      --surface2: #f0efea;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.22);
+      --text: #1a1a18;
+      --text2: #6b6b66;
+      --text3: #9e9e98;
+      --green: #1D9E75;
+      --green-light: #E1F5EE;
+      --green-mid: #5DCAA5;
+      --green-dark: #085041;
+      --green-text: #0F6E56;
+      --radius: 12px;
+      --radius-sm: 8px;
     }
+
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #1c1c1a; --surface: #262624; --surface2: #2e2e2b;
-        --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
-        --text: #f0efea; --text2: #a0a09a; --text3: #666662;
-        --green-light: #0a3328; --green-text: #5DCAA5;
+        --bg: #1c1c1a;
+        --surface: #262624;
+        --surface2: #2e2e2b;
+        --border: rgba(255,255,255,0.1);
+        --border2: rgba(255,255,255,0.2);
+        --text: #f0efea;
+        --text2: #a0a09a;
+        --text3: #666662;
+        --green-light: #0a3328;
+        --green-text: #5DCAA5;
       }
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1rem; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
     .container { max-width: 560px; margin: 0 auto; }
-    .header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; padding-top: 0.5rem; }
-    .header-icon { width: 36px; height: 36px; background: var(--green); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+      padding-top: 0.5rem;
+    }
+    .header-icon {
+      width: 36px; height: 36px;
+      background: var(--green);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
     .header-icon svg { width: 20px; height: 20px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    h1 { font-size: 20px; font-weight: 600; }
-    .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
+    h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+
+    .card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .full { grid-column: 1 / -1; }
+
     label { font-size: 13px; color: var(--text2); font-weight: 500; }
-    input, select { font-size: 15px; padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); width: 100%; outline: none; }
+
+    input, select {
+      font-size: 15px;
+      font-family: inherit;
+      padding: 9px 12px;
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.15); }
+    input::placeholder { color: var(--text3); }
+
     .route-row { display: flex; align-items: center; gap: 6px; }
-    .maps-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--green-text); border: 0.5px solid var(--green-mid); border-radius: 20px; padding: 6px 10px; background: var(--green-light); cursor: pointer; text-decoration: none; }
+    .route-row input { flex: 1; min-width: 0; }
+    .arrow { font-size: 16px; color: var(--text3); flex-shrink: 0; }
+
+    .maps-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; font-family: inherit;
+      color: var(--green-text);
+      border: 0.5px solid var(--green-mid);
+      border-radius: 20px;
+      padding: 6px 10px;
+      background: var(--green-light);
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+    .maps-btn:hover { opacity: 0.8; }
+    .maps-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
     .transport-row { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tp { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; padding: 7px 13px; border: 0.5px solid var(--border2); border-radius: 20px; cursor: pointer; }
+    .tp {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 13px; font-family: inherit;
+      padding: 7px 13px;
+      border: 0.5px solid var(--border2);
+      border-radius: 20px;
+      background: var(--surface);
+      color: var(--text2);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+    .tp:hover { background: var(--surface2); }
     .tp.on { background: var(--green-light); border-color: var(--green); color: var(--green-dark); font-weight: 600; }
+
+    .amount-section { display: flex; flex-direction: column; gap: 8px; }
+    .amount-quick { display: flex; gap: 6px; flex-wrap: wrap; }
+    .qbtn {
+      font-size: 13px; font-family: inherit;
+      padding: 5px 11px;
+      border: 0.5px solid var(--border2);
+      border-radius: 16px;
+      background: var(--surface2);
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .qbtn:hover { background: var(--green-light); border-color: var(--green); color: var(--green-text); }
+
     .amount-input-row { display: flex; align-items: center; gap: 8px; }
-    .btn-add { width: 100%; padding: 11px; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+    .yen { font-size: 16px; color: var(--text2); font-weight: 500; }
+    .amount-input-row input { flex: 1; }
+
+    .btn-add {
+      width: 100%; padding: 11px;
+      background: var(--green); color: white;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 600; font-family: inherit;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: opacity 0.15s;
+    }
+    .btn-add:hover { opacity: 0.88; }
+    .btn-add:active { opacity: 0.75; transform: scale(0.99); }
+
+    .section-label {
+      font-size: 11px; font-weight: 600;
+      color: var(--text2);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
     .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     .stat { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px 14px; }
-    .entry-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 8px; }
-    .avatar { width: 34px; height: 34px; border-radius: 50%; background: #9FE1CB; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #085041; }
-    .slack-section { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; background: var(--surface); margin-bottom: 2rem; }
-    .btn-slack { padding: 9px 16px; background: #4A154B; color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; }
-    .preview-box { margin-top: 12px; background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; white-space: pre-wrap; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: var(--radius-sm); opacity: 0; transition: opacity 0.3s; z-index: 999; }
+    .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+    .stat-value { font-size: 22px; font-weight: 600; color: var(--text); }
+
+    .entry-list { display: flex; flex-direction: column; gap: 8px; }
+    .entry-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+    }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #9FE1CB;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #085041;
+      flex-shrink: 0;
+    }
+    .entry-info { flex: 1; min-width: 0; }
+    .entry-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .entry-meta { font-size: 12px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .entry-amount { font-size: 15px; font-weight: 700; color: var(--green-text); flex-shrink: 0; }
+    .del-btn {
+      background: none; border: none;
+      color: var(--text3); cursor: pointer;
+      font-size: 20px; line-height: 1;
+      padding: 2px 6px; border-radius: 4px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .del-btn:hover { background: #fde8e8; color: #c0392b; }
+
+    .slack-section {
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      background: var(--surface);
+      margin-bottom: 2rem;
+    }
+    .slack-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .slack-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .webhook-row { display: flex; gap: 8px; }
+    .webhook-row input { flex: 1; font-size: 13px; display: none; }
+    .btn-slack {
+      padding: 9px 16px;
+      background: #4A154B; color: white;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600; font-family: inherit;
+      cursor: pointer; white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .btn-slack:hover { opacity: 0.88; }
+    .btn-slack:disabled { opacity: 0.38; cursor: default; }
+
+    .preview-box {
+      margin-top: 12px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 12px; color: var(--text2);
+      font-family: 'Menlo', 'Monaco', monospace;
+      white-space: pre-wrap; line-height: 1.6;
+    }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 600;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; z-index: 999;
+      white-space: nowrap;
+    }
     .toast.ok { background: var(--green); color: white; }
     .toast.ng { background: #e24b4a; color: white; }
     .toast.show { opacity: 1; }
@@ -57,60 +254,114 @@
 </head>
 <body>
 <div class="container">
+
   <div class="header">
-    <div class="header-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
     <h1>交通費トラッカー</h1>
   </div>
 
   <div class="card">
     <div class="form-grid">
-      <div class="form-group"><label>名前</label><input type="text" id="inp-name" placeholder="例：田中 太郎" /></div>
-      <div class="form-group"><label>日付</label><input type="date" id="inp-date" /></div>
+
+      <div class="form-group">
+        <label>名前</label>
+        <input type="text" id="inp-name" placeholder="例：田中 太郎" />
+      </div>
+
+      <div class="form-group">
+        <label>日付</label>
+        <input type="date" id="inp-date" />
+      </div>
+
       <div class="form-group full">
         <label>出発地 → 目的地</label>
         <div class="route-row">
           <input type="text" id="inp-from" placeholder="出発地" />
-          <span>→</span>
+          <span class="arrow">→</span>
           <input type="text" id="inp-to" placeholder="目的地" />
-          <button class="maps-btn" onclick="openMaps()">地図</button>
+          <button class="maps-btn" onclick="openMaps()">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            地図
+          </button>
         </div>
+        <span class="hint">※ 地図で運賃を確認してから金額を入力してください</span>
       </div>
+
       <div class="form-group full">
         <label>交通手段</label>
-        <div class="transport-row">
+        <div class="transport-row" id="tp-row">
           <div class="tp on" data-val="電車" onclick="selectTP(this)">🚃 電車</div>
           <div class="tp" data-val="バス" onclick="selectTP(this)">🚌 バス</div>
+          <div class="tp" data-val="自転車" onclick="selectTP(this)">🚲 自転車</div>
+          <div class="tp" data-val="タクシー" onclick="selectTP(this)">🚕 タクシー</div>
+          <div class="tp" data-val="徒歩" onclick="selectTP(this)">🚶 徒歩</div>
           <div class="tp" data-val="その他" onclick="selectTP(this)">🔖 その他</div>
         </div>
       </div>
+
       <div class="form-group full">
         <label>金額（円）</label>
-        <input type="number" id="inp-amount" placeholder="金額を入力" />
+        <div class="amount-section">
+          <div class="amount-quick">
+            <button class="qbtn" onclick="setAmount(140)">¥140</button>
+            <button class="qbtn" onclick="setAmount(170)">¥170</button>
+            <button class="qbtn" onclick="setAmount(200)">¥200</button>
+            <button class="qbtn" onclick="setAmount(230)">¥230</button>
+            <button class="qbtn" onclick="setAmount(260)">¥260</button>
+            <button class="qbtn" onclick="setAmount(310)">¥310</button>
+            <button class="qbtn" onclick="setAmount(400)">¥400</button>
+            <button class="qbtn" onclick="setAmount(500)">¥500</button>
+          </div>
+          <div class="amount-input-row">
+            <span class="yen">¥</span>
+            <input type="number" id="inp-amount" placeholder="金額を入力または上から選択" min="0" step="10" />
+          </div>
+        </div>
       </div>
+
     </div>
     <button class="btn-add" onclick="addEntry()">追加する</button>
   </div>
 
-  <div id="entries-section" style="display:none;">
+  <div id="entries-section" style="display:none; margin-bottom: 1rem;">
+    <p class="section-label">入力済みの交通費</p>
     <div class="summary">
-      <div class="stat"><div id="stat-count">0件</div></div>
-      <div class="stat"><div id="stat-total">¥0</div></div>
+      <div class="stat"><div class="stat-label">件数</div><div class="stat-value" id="stat-count">0件</div></div>
+      <div class="stat"><div class="stat-label">合計金額</div><div class="stat-value" id="stat-total">¥0</div></div>
     </div>
-    <div id="entry-list"></div>
+    <div class="entry-list" id="entry-list"></div>
   </div>
 
   <div class="slack-section">
-    <button class="btn-slack" id="btn-send" onclick="sendToSlack()">Slackへ送信</button>
+    <div class="slack-header">
+      <svg width="20" height="20" viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19.7 33.4a4.15 4.15 0 01-4.1 4.1 4.15 4.15 0 01-4.1-4.1 4.15 4.15 0 014.1-4.1h4.1v4.1zm2.1 0a4.15 4.15 0 014.1-4.1 4.15 4.15 0 014.1 4.1v10.3a4.15 4.15 0 01-4.1 4.1 4.15 4.15 0 01-4.1-4.1V33.4z" fill="#E01E5A"/>
+        <path d="M25.9 19.7a4.15 4.15 0 01-4.1-4.1 4.15 4.15 0 014.1-4.1 4.15 4.15 0 014.1 4.1v4.1H25.9zm0 2.1a4.15 4.15 0 014.1 4.1 4.15 4.15 0 01-4.1 4.1H15.6a4.15 4.15 0 01-4.1-4.1 4.15 4.15 0 014.1-4.1h10.3z" fill="#36C5F0"/>
+        <path d="M39.6 25.9a4.15 4.15 0 014.1 4.1 4.15 4.15 0 01-4.1 4.1 4.15 4.15 0 01-4.1-4.1V25.9h4.1zm-2.1 0a4.15 4.15 0 01-4.1-4.1 4.15 4.15 0 014.1-4.1h10.3a4.15 4.15 0 014.1 4.1 4.15 4.15 0 01-4.1 4.1H37.5z" fill="#2EB67D"/>
+        <path d="M33.4 39.6a4.15 4.15 0 014.1 4.1 4.15 4.15 0 01-4.1 4.1 4.15 4.15 0 01-4.1-4.1v-4.1h4.1zm0-2.1a4.15 4.15 0 01-4.1-4.1 4.15 4.15 0 014.1-4.1 4.15 4.15 0 014.1 4.1v10.3a4.15 4.15 0 01-4.1 4.1 4.15 4.15 0 01-4.1-4.1V37.5z" fill="#ECB22E"/>
+      </svg>
+      <span class="slack-title">Slackへ送信</span>
+    </div>
+    <div class="webhook-row">
+      <input type="text" id="webhook-url" placeholder="Webhook URL（https://hooks.slack.com/...）" />
+      <button class="btn-slack" id="btn-send" onclick="sendToSlack()" disabled>送信</button>
+    </div>
     <div id="preview-area"></div>
   </div>
+
 </div>
+
 <div class="toast" id="toast"></div>
 
 <script>
   const entries = [];
   let transport = '電車';
-  // あなたのGASのURL
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwLfLgHeMpPX90B6cKjvkxrIYgGI-RVOGc9FLZCbotsNsgV83RZ9-N_tfaQns5dtMcBsQ/exec';
+
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbySI4hIha_mAxYI2YKtYGW7xcNprke9uxGQQJlK1kKfLy5uHXxXqOF_XkpE40LPdhe-ZA/exec';
+  
+  document.getElementById('btn-send').disabled = false;
 
   document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
 
@@ -120,49 +371,92 @@
     transport = el.dataset.val;
   }
 
+  function setAmount(v) {
+    document.getElementById('inp-amount').value = v;
+  }
+
+  function openMaps() {
+    const from = document.getElementById('inp-from').value.trim();
+    const to = document.getElementById('inp-to').value.trim();
+    if (!from || !to) { showToast('出発地と目的地を入力してください', 'ng'); return; }
+    const url = 'https://www.google.com/maps/dir/' + encodeURIComponent(from) + '/' + encodeURIComponent(to) + '/?travelmode=transit&hl=ja';
+    window.open(url, '_blank');
+  }
+
+  function getInitials(name) {
+    return name.trim().split(/\s+/).map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
+
   function addEntry() {
     const name = document.getElementById('inp-name').value.trim();
+    const date = document.getElementById('inp-date').value;
     const from = document.getElementById('inp-from').value.trim();
     const to = document.getElementById('inp-to').value.trim();
     const amount = parseInt(document.getElementById('inp-amount').value);
-    const date = document.getElementById('inp-date').value;
 
-    if (!name || !from || !to || !amount) { showToast('入力してください', 'ng'); return; }
+    if (!name || !date || !from || !to || !amount || amount < 0) {
+      showToast('すべての項目を入力してください', 'ng'); return;
+    }
+
     entries.push({ name, date, from, to, amount, transport });
+    document.getElementById('inp-amount').value = '';
     renderEntries();
     updatePreview();
     showToast('追加しました！', 'ok');
   }
 
+  function deleteEntry(i) {
+    entries.splice(i, 1);
+    renderEntries();
+    updatePreview();
+  }
+
   function renderEntries() {
+    const list = document.getElementById('entry-list');
     const section = document.getElementById('entries-section');
-    section.style.display = entries.length ? 'block' : 'none';
+    if (!entries.length) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
     const total = entries.reduce((s, e) => s + e.amount, 0);
     document.getElementById('stat-count').textContent = entries.length + '件';
     document.getElementById('stat-total').textContent = '¥' + total.toLocaleString();
-    document.getElementById('entry-list').innerHTML = entries.map((e, i) => `
+
+    list.innerHTML = entries.map((e, i) => `
       <div class="entry-item">
-        <div style="flex:1"><b>${e.name}</b><br><small>${e.from}→${e.to}</small></div>
-        <div>¥${e.amount.toLocaleString()}</div>
+        <div class="avatar">${getInitials(e.name)}</div>
+        <div class="entry-info">
+          <div class="entry-name">${e.name}</div>
+          <div class="entry-meta">${e.date}・${e.from}→${e.to}・${e.transport}</div>
+        </div>
+        <div class="entry-amount">¥${e.amount.toLocaleString()}</div>
+        <button class="del-btn" onclick="deleteEntry(${i})">×</button>
       </div>
     `).join('');
   }
 
   function buildSlackMsg() {
     if (!entries.length) return null;
-    let txt = '*交通費報告*\n';
-    entries.forEach(e => { txt += `• ${e.name}: ${e.from}→${e.to} ¥${e.amount}\n`; });
+    const total = entries.reduce((s, e) => s + e.amount, 0);
+    const dateStr = entries.map(e => e.date).sort()[0];
+    const icons = { '電車': '🚃', 'バス': '🚌', '自転車': '🚲', 'タクシー': '🚕', '徒歩': '🚶', 'その他': '🔖' };
+
+    let txt = '*交通費報告 — ' + dateStr + '*\n\n';
+    entries.forEach(e => {
+      const ic = icons[e.transport] || '🔖';
+      txt += '• *' + e.name + '*　' + ic + ' ' + e.from + ' → ' + e.to + '　*¥' + e.amount.toLocaleString() + '*\n';
+    });
+    txt += '\n合計: *¥' + total.toLocaleString() + '*（' + entries.length + '件）';
     return txt;
   }
 
   function updatePreview() {
+    const area = document.getElementById('preview-area');
     const msg = buildSlackMsg();
-    document.getElementById('preview-area').innerHTML = msg ? `<div class="preview-box">${msg}</div>` : '';
+    area.innerHTML = msg ? '<div class="preview-box">' + msg + '</div>' : '';
   }
 
   async function sendToSlack() {
-    const msg = buildSlackMsg();
-    if (!msg) { showToast('データがありません', 'ng'); return; }
+    if (!entries.length) { showToast('データがありません', 'ng'); return; }
 
     const btn = document.getElementById('btn-send');
     btn.disabled = true;
@@ -171,27 +465,23 @@
     try {
       await fetch(GAS_URL, {
         method: 'POST',
-        body: JSON.stringify({ text: msg })
+        mode: 'no-cors',
+        body: JSON.stringify({ entries: entries })
       });
-      showToast('Slackに送信しました！', 'ok');
-    } catch (e) {
-      showToast('エラーが発生しました', 'ng');
+      showToast('スプレッドシートに送信しました！', 'ok');
+    } catch {
+      showToast('送信失敗。GASのURLを確認してください', 'ng');
     }
+
     btn.disabled = false;
-    btn.textContent = 'Slackへ送信';
+    btn.textContent = '送信する';
   }
 
   function showToast(msg, type) {
     const t = document.getElementById('toast');
     t.textContent = msg;
-    t.className = `toast ${type} show`;
+    t.className = 'toast ' + type + ' show';
     setTimeout(() => t.classList.remove('show'), 3000);
-  }
-
-  function openMaps() {
-    const from = document.getElementById('inp-from').value;
-    const to = document.getElementById('inp-to').value;
-    window.open(`https://www.google.com/maps/dir/${from}/${to}/`, '_blank');
   }
 </script>
 </body>
