@@ -99,12 +99,12 @@
     <div id="entry-list"></div>
   </div>
 
-  <div class="slack-section">
-    <button class="btn-slack" id="btn-send" onclick="sendToSlack()">Slackへ送信</button>
-    <div id="preview-area"></div>
-  </div>
+<div class="slack-section">
+  <button class="btn-slack" id="btn-send" onclick="sendToSlack()" style="background: var(--green);">
+    スプレッドシートに保存
+  </button>
+  <div id="preview-area"></div>
 </div>
-<div class="toast" id="toast"></div>
 
 <script>
   const entries = [];
