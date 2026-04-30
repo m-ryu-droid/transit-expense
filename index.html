@@ -215,7 +215,7 @@
     .slack-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
     .slack-title { font-size: 14px; font-weight: 600; color: var(--text); }
     .webhook-row { display: flex; gap: 8px; }
-    .webhook-row input { flex: 1; font-size: 13px; }
+    .webhook-row input { flex: 1; font-size: 13px; display: none; }
     .btn-slack {
       padding: 9px 16px;
       background: #4A154B; color: white;
@@ -359,6 +359,10 @@
   const entries = [];
   let transport = '電車';
 
+  const WEBHOOK_URL = 'https://hooks.slack.com/services/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';
+  document.getElementById('webhook-url').value = WEBHOOK_URL;
+  document.getElementById('btn-send').disabled = false;
+
   document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
 
   function selectTP(el) {
@@ -451,12 +455,8 @@
     area.innerHTML = msg ? '<div class="preview-box">' + msg + '</div>' : '';
   }
 
-  document.getElementById('webhook-url').addEventListener('input', function() {
-    document.getElementById('btn-send').disabled = !this.value.trim();
-  });
-
   async function sendToSlack() {
-    const url = document.getElementById('webhook-url').value.trim();
+    const url = WEBHOOK_URL;
     const msg = buildSlackMsg();
     if (!url || !msg) return;
 
