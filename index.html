@@ -456,35 +456,35 @@
   }
 
 async function sendToSlack() {
-    if (!entries.length) { showToast('データがありません', 'ng'); return; }
+  if (!entries.length) { showToast('データがありません', 'ng'); return; }
 
-    const btn = document.getElementById('btn-send');
-    btn.disabled = true;
-    btn.textContent = '送信中...';
+  const btn = document.getElementById('btn-send');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
 
-    // GASが受け取れるように、プレビューと同じ「1つの文章」にまとめる
-    const msg = buildSlackMsg(); 
-
-    try {
-      await fetch(GAS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({ text: msg }) // ここを「text」にする！
-      });
-      showToast('スプレッドシートに送信しました！', 'ok');
-      
-      // 送信成功したらリストを空にする（任意）
-      entries.length = 0;
-      renderEntries();
-      updatePreview();
-      
-    } catch {
-      showToast('送信失敗。GASのURLを確認してください', 'ng');
-    }
-
-    btn.disabled = false;
-    btn.textContent = '送信する';
+  // 1つ1つの項目をバラバラに保ったまま、GASへ送る
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify({ items: entries }) // 'text' ではなく 'items' として送る
+    });
+    
+    showToast('スプレッドシートに保存しました！', 'ok');
+    
+    // 送信成功後、リストをクリアする
+    entries.length = 0;
+    renderEntries();
+    updatePreview();
+    
+  } catch (error) {
+    showToast('送信失敗。GASのURLを確認してください', 'ng');
+    console.error(error);
   }
+
+  btn.disabled = false;
+  btn.textContent = '送信する';
+}
 
   function showToast(msg, type) {
     const t = document.getElementById('toast');
