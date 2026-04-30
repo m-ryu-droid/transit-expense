@@ -455,20 +455,29 @@
     area.innerHTML = msg ? '<div class="preview-box">' + msg + '</div>' : '';
   }
 
-  async function sendToSlack() {
+async function sendToSlack() {
     if (!entries.length) { showToast('データがありません', 'ng'); return; }
 
     const btn = document.getElementById('btn-send');
     btn.disabled = true;
     btn.textContent = '送信中...';
 
+    // GASが受け取れるように、プレビューと同じ「1つの文章」にまとめる
+    const msg = buildSlackMsg(); 
+
     try {
       await fetch(GAS_URL, {
         method: 'POST',
         mode: 'no-cors',
-        body: JSON.stringify({ entries: entries })
+        body: JSON.stringify({ text: msg }) // ここを「text」にする！
       });
       showToast('スプレッドシートに送信しました！', 'ok');
+      
+      // 送信成功したらリストを空にする（任意）
+      entries.length = 0;
+      renderEntries();
+      updatePreview();
+      
     } catch {
       showToast('送信失敗。GASのURLを確認してください', 'ng');
     }
